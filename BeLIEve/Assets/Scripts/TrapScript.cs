@@ -6,7 +6,7 @@ public class TrapScript : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            GameManager.instance.PlayerDied();
+            Debug.Log("Player hit a trap!");
         }
     }
 }
