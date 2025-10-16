@@ -4,50 +4,53 @@ using TMPro;
 public class TextTitleScript : MonoBehaviour
 {
     private TMP_Text titleText;
+    private TMP_TextInfo textInfo;
+
+    private int startIndex;
+    private int endIndex;
+    private string target = "LIE";
 
     void Start()
     {
-        // Get the TextMeshPro component
         titleText = GetComponent<TMP_Text>();
-
-        // Set the text
         titleText.text = "BELIEVE";
 
-        // Generate mesh info
         titleText.ForceMeshUpdate();
+        textInfo = titleText.textInfo;
 
-        TMP_TextInfo textInfo = titleText.textInfo;
-
-        // Find and color only the substring "LIE"
         string fullText = titleText.text;
-        string target = "LIE";
+        startIndex = fullText.IndexOf(target);
+        endIndex = startIndex + target.Length;
+    }
 
-        int startIndex = fullText.IndexOf(target);
-        if (startIndex != -1)
+    void Update()
+    {
+        if (startIndex == -1) return;
+
+        float flash = Mathf.PingPong(Time.time * 2f, 1f); // speed = 2
+
+        Color32 flashColor = Color32.Lerp(new Color32(255, 255, 255, 255), new Color32(255, 0, 0, 255), flash);
+
+        titleText.ForceMeshUpdate();
+        textInfo = titleText.textInfo;
+
+        for (int i = startIndex; i < endIndex; i++)
         {
-            // Loop through the characters that make up "LIE"
-            for (int i = startIndex; i < startIndex + target.Length; i++)
-            {
-                TMP_CharacterInfo charInfo = textInfo.characterInfo[i];
+            TMP_CharacterInfo charInfo = textInfo.characterInfo[i];
+            if (!charInfo.isVisible)
+                continue;
 
-                if (!charInfo.isVisible)
-                    continue;
+            int meshIndex = charInfo.materialReferenceIndex;
+            int vertexIndex = charInfo.vertexIndex;
 
-                int meshIndex = charInfo.materialReferenceIndex;
-                int vertexIndex = charInfo.vertexIndex;
+            Color32[] vertexColors = textInfo.meshInfo[meshIndex].colors32;
 
-                Color32[] vertexColors = textInfo.meshInfo[meshIndex].colors32;
-
-                Color32 red = new Color32(255, 0, 0, 255);
-
-                vertexColors[vertexIndex + 0] = red;
-                vertexColors[vertexIndex + 1] = red;
-                vertexColors[vertexIndex + 2] = red;
-                vertexColors[vertexIndex + 3] = red;
-            }
-
-            // Apply color changes to the mesh
-            titleText.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
+            vertexColors[vertexIndex + 0] = flashColor;
+            vertexColors[vertexIndex + 1] = flashColor;
+            vertexColors[vertexIndex + 2] = flashColor;
+            vertexColors[vertexIndex + 3] = flashColor;
         }
+
+        titleText.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
     }
 }
