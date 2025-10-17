@@ -5,36 +5,46 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public int lives = 5;
-    private Vector2 playerStartPosition;
-    private GameObject player;
+    private string lastLevel;
+    private bool isProcessingDeath = false; // Add this
 
     void Awake()
     {
         if (instance == null)
+        {
             instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else
+        {
             Destroy(gameObject);
-
-        DontDestroyOnLoad(gameObject);
+            return;
+        }
     }
 
-    void Start()
+    public void RegisterLevel(string levelName)
     {
-        player = GameObject.FindWithTag("Player");
-        playerStartPosition = player.transform.position;
+        lastLevel = levelName;
     }
 
     public void PlayerDied()
     {
+        if (isProcessingDeath) return;
+        
+        isProcessingDeath = true;
         lives--;
-        if (lives >= 0)
-        {
-            player.transform.position = playerStartPosition;
-        }
-        else
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            lives = 5;
-        }
+        SceneManager.LoadScene("RetryScene");
+    }
+
+    public void RetryLevel()
+    {
+        isProcessingDeath = false;
+        SceneManager.LoadScene(lastLevel);
+    }
+
+    public void QuitGame()
+    {
+        isProcessingDeath = false;
+        SceneManager.LoadScene("MainMenu");
     }
 }

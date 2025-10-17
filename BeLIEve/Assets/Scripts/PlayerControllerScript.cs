@@ -6,6 +6,7 @@ public class PlayerControllerScript : MonoBehaviour
     public float jumpForce = 9f;
     private Rigidbody2D rb;
     private bool isGrounded;
+    private bool isDead = false;
 
     void Start()
     {
@@ -21,13 +22,19 @@ public class PlayerControllerScript : MonoBehaviour
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 
-    void OnCollisionEnter2D(Collision2D col)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (col.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground"))
             isGrounded = true;
+
+        if (collision.gameObject.CompareTag("Trap") && !isDead)
+        {
+            isDead = true;
+            GameManager.instance.PlayerDied();
+        }
     }
 
-    void OnCollisionExit2D(Collision2D col)
+    private void OnCollisionExit2D(Collision2D col)
     {
         if (col.gameObject.CompareTag("Ground"))
             isGrounded = false;
