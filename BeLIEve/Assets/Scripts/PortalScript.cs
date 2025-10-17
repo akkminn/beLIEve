@@ -3,13 +3,20 @@ using UnityEngine.SceneManagement;
 
 public class PortalScript : MonoBehaviour
 {
-    public string nextLevelName;
+    public string nextSceneName; // assign this in the inspector
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (other.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            SceneManager.LoadScene(nextLevelName);
+            if (!string.IsNullOrEmpty(nextSceneName))
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                Debug.LogWarning("Next scene name not set on portal!");
+            }
         }
     }
 }
