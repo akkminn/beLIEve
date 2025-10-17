@@ -4,6 +4,9 @@ public class LevelManager : MonoBehaviour
 {
     void Start()
     {
-        GameManager.instance.RegisterLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.RegisterLevel(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        }
     }
 }
